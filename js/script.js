@@ -1,4 +1,4 @@
-const LIFF_ID = "2008429094-YTq3YOaG";
+const LIFF_ID = "2008429094-FMj09cl0";
 let userProfile = null;
 
 // 1. เรียก liff.init() ครั้งเดียวตอนโหลดเว็บ ไม่ต้อง re-init อีกเลยตลอดการใช้งาน
