@@ -15,6 +15,7 @@ body {
     min-height: 100vh;
     scrollbar-gutter: stable;
     overflow: hidden;        /* << ปิด scroll ของ body ไม่ให้ซ้อนกับ container */
+    overflow-x: hidden;   /* << เพิ่ม เผื่อกรณี viewport แคบกว่า 390px */
 
 }
 
@@ -28,6 +29,7 @@ body {
     margin-top: 0;      /* กำหนด margin ด้านบนเป็น 0 */
     margin: 0 auto; /* ล็อคกรอบให้อยู่กึ่งกลางหน้าจอเสมอ */
     overflow-y: auto;
+    overflow-x: hidden;   /* << เพิ่มบรรทัดนี้ ห้ามเลื่อนซ้าย-ขวา ให้เลื่อนได้แค่แนวตั้ง */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border-radius: 12px;
     display: flex;
