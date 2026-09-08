@@ -130,6 +130,25 @@
                     <span class="field-error" id="err-fullName"></span>
                 </div>
 
+                <div class="form-group form-group--passport">
+                    <label>ประเภทพาสปอร์ต</label>
+                    <div class="passport-type-toggle">
+                        <button type="button" class="passport-type-btn active" data-type="thai" id="btn-passport-thai">พาสปอร์ตไทย</button>
+                        <button type="button" class="passport-type-btn" data-type="foreign" id="btn-passport-foreign">พาสปอร์ตต่างชาติ</button>
+                    </div>
+                    <input type="hidden" id="passportType" value="thai">
+                </div>
+
+                <div class="form-group">
+                    <label>วันเดินทาง</label>
+                    <div class="input-search" id="travelDatePickerTrigger" style="cursor:pointer;">
+                        <input type="text" id="travelDate" placeholder="วว/ดด/ปปปป" readonly style="cursor:pointer;">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </div>
+                    <input type="hidden" id="travelDateISO" value="">
+                    <span class="field-error" id="err-travelDate"></span>
+                </div>
+
                 <div class="form-group">
                     <label>เบอร์โทรศัพท์</label>
                     <div class="input-text">
@@ -203,7 +222,7 @@
         <div class="info-card">
             <div class="badge-tag">2 เอกสารเพื่อดำเนินการ</div>
             <ul class="info-list">
-                <li>2.1 พาสปอร์ตที่มีอายุมากกว่า 6 เดือน นับจากวันที่เดินทาง</li>
+                <li>2.1 พาสปอร์ตไทยที่มีอายุมากกว่า 6 เดือน นับจากวันที่เดินทาง</li>
                 <li>2.2 สำเนาหน้าพาสปอร์ต</li>
                 <li>2.3 รูปถ่ายพื้นหลังสีขาว</li>
             </ul>

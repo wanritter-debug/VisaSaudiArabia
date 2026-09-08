@@ -39,13 +39,15 @@ async function submitBooking(event) {
 
     const fullName = document.getElementById("fullName").value.trim();
     const phone = document.getElementById("phone").value.trim();
+    const travelDateISO = document.getElementById("travelDateISO").value;
+    const travelDateDisplay = document.getElementById("travelDate").value;
     const qty = document.getElementById("qty-input").value;
     const hotelMakkah = document.getElementById("hotelMakkah").value.trim() || '-';
     const hotelMadinah = document.getElementById("hotelMadinah").value.trim() || '-';
     const priceDisplay = document.getElementById("price-display").textContent.trim();
      // เคลียร์ข้อความเตือนเก่าก่อนเช็คใหม่ทุกครั้ง
-    ["fullName", "phone", "hotelMakkah", "hotelMadinah"].forEach(id => {
-        document.getElementById("err-" + id).textContent = "";
+    ["fullName", "phone", "travelDate", "hotelMakkah", "hotelMadinah"].forEach(id => {
+    document.getElementById("err-" + id).textContent = "";
     });
 
     let hasError = false;
@@ -55,6 +57,10 @@ async function submitBooking(event) {
     }
     if (!phone) {
         document.getElementById("err-phone").textContent = "กรุณากรอกเบอร์โทรศัพท์";
+        hasError = true;
+    }
+    if (!travelDateISO) {
+        document.getElementById("err-travelDate").textContent = "กรุณาเลือกวันเดินทาง";
         hasError = true;
     }
     if (!hotelMakkah || hotelMakkah === '-') {
@@ -91,6 +97,7 @@ const messageText =
     `═══════════════════\n` +
     `ชื่อ-สกุล: ${fullName}\n` +
     `เบอร์โทร: ${phone}\n` +
+    `วันเดินทาง: ${travelDateDisplay}\n` +
     `จำนวนผู้เดินทาง: ${qty} ท่าน\n` +
     `═══════════════════\n` +
     `ที่พักมักกะห์: ${hotelMakkah}\n` +
@@ -152,7 +159,7 @@ async function submitBookingTourism(event) {
     const pricePerPerson = (parseInt(qty) > 0)
         ? Math.round(parseInt(priceDisplay.replace(/[^\d]/g, '')) / parseInt(qty)).toLocaleString()
         : '';
-
+    
     const messageText =
         `ข้อความการจองวีซ่าท่องเที่ยว\n` +
         `เลขที่จอง: ${bookingId}\n` +
@@ -366,6 +373,114 @@ function selectHotel(type, name) {
     closeHotelPicker();
 }
 
+const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                      'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const THAI_WEEKDAYS = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+
+let selectedTravelDate = null;
+let dpViewDate = new Date();
+
+function closeDatePicker() {
+    const existing = document.getElementById('datePickerModal');
+    if (existing) existing.remove();
+}
+
+function openDatePicker() {
+    dpViewDate = selectedTravelDate ? new Date(selectedTravelDate) : new Date();
+    renderDatePicker();
+}
+
+function renderDatePicker() {
+    closeDatePicker();
+
+    const year = dpViewDate.getFullYear();
+    const month = dpViewDate.getMonth();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const firstDayOfMonth = new Date(year, month, 1);
+    const startWeekday = firstDayOfMonth.getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+    let cells = [];
+    for (let i = startWeekday - 1; i >= 0; i--) {
+        cells.push({ day: daysInPrevMonth - i, otherMonth: true });
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+        cells.push({ day: d, otherMonth: false, date: new Date(year, month, d) });
+    }
+    while (cells.length % 7 !== 0) {
+        cells.push({ day: cells.length, otherMonth: true });
+    }
+
+    const weekdayHtml = THAI_WEEKDAYS.map(w => `<div class="dp-weekday">${w}</div>`).join('');
+
+    const daysHtml = cells.map(c => {
+        if (c.otherMonth) {
+            return `<button type="button" class="dp-day dp-day--other-month" disabled>${c.day}</button>`;
+        }
+        const isPast = c.date < today;
+        const isToday = c.date.getTime() === today.getTime();
+        const isSelected = selectedTravelDate &&
+            c.date.toDateString() === selectedTravelDate.toDateString();
+
+        let cls = 'dp-day';
+        if (isToday) cls += ' dp-day--today';
+        if (isSelected) cls += ' dp-day--selected';
+        if (isPast) cls += ' dp-day--disabled';
+
+        return `<button type="button" class="${cls}" data-date="${c.date.toISOString()}" ${isPast ? 'disabled' : ''}>${c.day}</button>`;
+    }).join('');
+
+    const modal = document.createElement('div');
+    modal.id = 'datePickerModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);display:flex;justify-content:center;align-items:center;z-index:9999;padding:20px;';
+
+    modal.innerHTML = `
+        <div class="date-picker-card">
+            <div class="date-picker-header">
+                <button type="button" class="date-picker-nav" id="dpPrevMonth"><i class="fa-solid fa-chevron-left"></i></button>
+                <span class="dp-title">${THAI_MONTHS[month]} ${year + 543}</span>
+                <button type="button" class="date-picker-nav" id="dpNextMonth"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="date-picker-weekdays">${weekdayHtml}</div>
+            <div class="date-picker-grid">${daysHtml}</div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeDatePicker();
+    });
+
+    document.getElementById('dpPrevMonth').addEventListener('click', () => {
+        dpViewDate = new Date(year, month - 1, 1);
+        renderDatePicker();
+    });
+    document.getElementById('dpNextMonth').addEventListener('click', () => {
+        dpViewDate = new Date(year, month + 1, 1);
+        renderDatePicker();
+    });
+
+    modal.querySelectorAll('.dp-day[data-date]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectTravelDate(new Date(btn.getAttribute('data-date')));
+        });
+    });
+}
+
+function selectTravelDate(date) {
+    selectedTravelDate = date;
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const yyyy = date.getFullYear();
+
+    document.getElementById('travelDate').value = `${dd}/${mm}/${yyyy}`;
+    document.getElementById('travelDateISO').value = `${yyyy}-${mm}-${dd}`;
+    closeDatePicker();
+}
+
     // 5. เมื่อ DOM พร้อม: ผูกปุ่ม, ระบบคำนวณราคา, ระบบล็อกการ์ดจนกว่าเพจจะโหลดครบ
 
 
@@ -391,6 +506,11 @@ function selectHotel(type, name) {
         // ----- ฟิลเตอร์โรงแรมตามดาว -----
     document.getElementById('makkahPickerTrigger').addEventListener('click', () => openHotelPicker('makkah'));
     document.getElementById('madinahPickerTrigger').addEventListener('click', () => openHotelPicker('madinah'));
+    // ----- เปิดปฏิทินไทย (วันเดินทาง) -----
+    const travelDateTrigger = document.getElementById('travelDatePickerTrigger');
+    if (travelDateTrigger) {
+        travelDateTrigger.addEventListener('click', () => openDatePicker());
+    }
 
      // ----- แสดง % โหลดจากจำนวนรูปภาพจริง -----
     const overlay = document.getElementById('loading-overlay');
@@ -426,6 +546,27 @@ function selectHotel(type, name) {
         });
     }
 
+    // ----- toggle ประเภทพาสปอร์ต (เฉพาะวีซ่าอุมเราะห์) -----
+    const btnPassportThai = document.getElementById('btn-passport-thai');
+    const btnPassportForeign = document.getElementById('btn-passport-foreign');
+    const passportTypeInput = document.getElementById('passportType');
+
+    if (btnPassportThai && btnPassportForeign && passportTypeInput) {
+        btnPassportThai.addEventListener('click', () => {
+            passportTypeInput.value = 'thai';
+            btnPassportThai.classList.add('active');
+            btnPassportForeign.classList.remove('active');
+            updatePrice();
+        });
+
+        btnPassportForeign.addEventListener('click', () => {
+            passportTypeInput.value = 'foreign';
+            btnPassportForeign.classList.add('active');
+            btnPassportThai.classList.remove('active');
+            updatePrice();
+        });
+    }
+
     // ----- คำนวณราคาและระบบปุ่มบวกลบ -----
     const plusBtn = document.getElementById('btn-plus');
     const minusBtn = document.getElementById('btn-minus');
@@ -434,8 +575,19 @@ function selectHotel(type, name) {
     const discountBadge = document.getElementById('discount-badge');
 
     function updatePrice() {
-        let qty = parseInt(qtyInput.value) || 1;
-        let pricePerPerson = 6500;
+    let qty = parseInt(qtyInput.value) || 1;
+    const passportType = passportTypeInput ? passportTypeInput.value : 'thai';
+    let pricePerPerson;
+
+    if (passportType === 'foreign') {
+        // พาสปอร์ตต่างชาติ: ราคาคงที่ 8,500 ไม่มีส่วนลด
+        pricePerPerson = 8500;
+        if (discountBadge) {
+            discountBadge.textContent = '';
+        }
+    } else {
+        // พาสปอร์ตไทย: ใช้ราคา + ส่วนลดตามจำนวนคนแบบเดิม
+        pricePerPerson = 6500;
 
         if (qty >= 6 && qty <= 9) {
             pricePerPerson = 5800;
@@ -455,10 +607,11 @@ function selectHotel(type, name) {
                 discountBadge.style.color = '#666666';
             }
         }
-
-        let totalPrice = qty * pricePerPerson;
-        if (priceDisplay) priceDisplay.textContent = totalPrice.toLocaleString() + ' บาท';
     }
+
+    let totalPrice = qty * pricePerPerson;
+    if (priceDisplay) priceDisplay.textContent = totalPrice.toLocaleString() + ' บาท';
+}
 
     if (plusBtn && minusBtn && qtyInput && priceDisplay) {
         plusBtn.addEventListener('click', () => {
