@@ -45,6 +45,8 @@ async function submitBooking(event) {
     const hotelMakkah = document.getElementById("hotelMakkah").value.trim() || '-';
     const hotelMadinah = document.getElementById("hotelMadinah").value.trim() || '-';
     const priceDisplay = document.getElementById("price-display").textContent.trim();
+    const passportType = document.getElementById("passportType").value;
+const passportTypeText = passportType === 'foreign' ? 'ต่างชาติ' : 'ไทย';
      // เคลียร์ข้อความเตือนเก่าก่อนเช็คใหม่ทุกครั้ง
     ["fullName", "phone", "travelDate", "hotelMakkah", "hotelMadinah"].forEach(id => {
     document.getElementById("err-" + id).textContent = "";
@@ -97,6 +99,7 @@ const messageText =
     `═══════════════════\n` +
     `ชื่อ-สกุล: ${fullName}\n` +
     `เบอร์โทร: ${phone}\n` +
+    `ประเภทพาสปอร์ต: ${passportTypeText}\n` +  
     `วันเดินทาง: ${travelDateDisplay}\n` +
     `จำนวนผู้เดินทาง: ${qty} ท่าน\n` +
     `═══════════════════\n` +
