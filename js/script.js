@@ -211,7 +211,7 @@ function showCopyPopup(message) {
     popup.innerHTML = `
         <div style="background:#fff;padding:20px;border-radius:10px;max-width:90%;width:400px;text-align:center;">
             <h3 style="margin-top:0;">สำเร็จการกรอกข้อมูล</h3>
-            <p style="font-size:13px;color:#666;">กรุณาคัดลอกข้อความด้านล่างเพื่อส่งไปยัง LINE Chat</p>
+            <p style="font-size:13px;color:#666;">"คัดลอกข้อความด้านล่าง ส่งไปที่ LINE ID: @alhijrah"</p>
             <textarea readonly style="width:100%;height:180px;margin:10px 0;padding:8px;border:1px solid #ccc;border-radius:5px;resize:none;font-size:13px;">${message}</textarea>
             <div style="display:flex;gap:10px;justify-content:center;margin-top:10px;">
                 <button id="copyBtn" style="padding:10px 15px;background:#00b900;color:#fff;border:none;border-radius:5px;cursor:pointer;">คัดลอกข้อความ</button>
