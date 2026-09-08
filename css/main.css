@@ -162,6 +162,10 @@ body {
     margin-left: 90px;
 }
 
+.detail-header .header-title.header-title--list {
+    margin-left: 70px;
+}
+
 /* การ์ดข้อความรายละเอียด */
 .info-card {
     position: relative;

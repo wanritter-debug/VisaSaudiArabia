@@ -550,12 +550,14 @@ function selectTravelDate(date) {
     const btnPassportThai = document.getElementById('btn-passport-thai');
     const btnPassportForeign = document.getElementById('btn-passport-foreign');
     const passportTypeInput = document.getElementById('passportType');
+    const docWorkPermit = document.getElementById('doc-work-permit');   // << เพิ่มบรรทัดนี้
 
     if (btnPassportThai && btnPassportForeign && passportTypeInput) {
         btnPassportThai.addEventListener('click', () => {
             passportTypeInput.value = 'thai';
             btnPassportThai.classList.add('active');
             btnPassportForeign.classList.remove('active');
+            if (docWorkPermit) docWorkPermit.style.display = 'none';   // << เพิ่ม ซ่อนเมื่อเลือกไทย
             updatePrice();
         });
 
@@ -563,6 +565,7 @@ function selectTravelDate(date) {
             passportTypeInput.value = 'foreign';
             btnPassportForeign.classList.add('active');
             btnPassportThai.classList.remove('active');
+            if (docWorkPermit) docWorkPermit.style.display = 'list-item';   // << เพิ่ม แสดงเมื่อเลือกต่างชาติ
             updatePrice();
         });
     }
