@@ -60,6 +60,9 @@ const passportTypeText = passportType === 'foreign' ? 'ต่างชาติ'
     if (!phone) {
         document.getElementById("err-phone").textContent = "กรุณากรอกเบอร์โทรศัพท์";
         hasError = true;
+    } else if (!isValidThaiPhone(phone)) {
+        document.getElementById("err-phone").textContent = "กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก รูปแบบ 0XX-XXX-XXXX";
+        hasError = true;
     }
     if (!travelDateISO) {
         document.getElementById("err-travelDate").textContent = "กรุณาเลือกวันเดินทาง";
@@ -149,6 +152,9 @@ async function submitBookingTourism(event) {
     }
     if (!phone) {
         document.getElementById("err-phoneTourism").textContent = "กรุณากรอกเบอร์โทรศัพท์";
+        hasError = true;
+    } else if (!isValidThaiPhone(phone)) {
+        document.getElementById("err-phoneTourism").textContent = "กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก รูปแบบ 0XX-XXX-XXXX";
         hasError = true;
     }
     if (hasError) return;
@@ -393,6 +399,24 @@ function openDatePicker() {
     renderDatePicker();
 }
 
+// ----- จัดรูปแบบเบอร์โทรศัพท์อัตโนมัติ 0XX-XXX-XXXX -----
+function formatPhoneInput(e) {
+    let digits = e.target.value.replace(/\D/g, '').slice(0, 10);   // เอาเฉพาะตัวเลข ไม่เกิน 10 หลัก
+
+    let formatted = digits;
+    if (digits.length > 3) {
+        formatted = digits.slice(0, 3) + '-' + digits.slice(3);
+    }
+    if (digits.length > 6) {
+        formatted = digits.slice(0, 3) + '-' + digits.slice(3, 6) + '-' + digits.slice(6);
+    }
+    e.target.value = formatted;
+}
+
+function isValidThaiPhone(value) {
+    return /^0\d{2}-\d{3}-\d{4}$/.test(value);
+}
+
 function renderDatePicker() {
     closeDatePicker();
 
@@ -514,6 +538,13 @@ function selectTravelDate(date) {
     if (travelDateTrigger) {
         travelDateTrigger.addEventListener('click', () => openDatePicker());
     }
+
+    // ----- ผูกการจัดรูปแบบเบอร์โทรศัพท์อัตโนมัติ -----
+const phoneInput = document.getElementById('phone');
+const phoneInputTourism = document.getElementById('phoneTourism');
+
+if (phoneInput) phoneInput.addEventListener('input', formatPhoneInput);
+if (phoneInputTourism) phoneInputTourism.addEventListener('input', formatPhoneInput);
 
      // ----- แสดง % โหลดจากจำนวนรูปภาพจริง -----
     const overlay = document.getElementById('loading-overlay');
